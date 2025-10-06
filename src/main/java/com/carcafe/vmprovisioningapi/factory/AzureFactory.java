@@ -1,11 +1,21 @@
 package com.carcafe.vmprovisioningapi.factory;
 
-import com.carcafe.vmprovisioningapi.model.AzureProvisioner;
-import com.carcafe.vmprovisioningapi.model.VMProvisioner;
+import com.carcafe.vmprovisioningapi.model.*;
 
-public class AzureFactory extends VMFactory {
+public class AzureFactory implements AbstractFactory {
+
     @Override
-    public VMProvisioner createProvisioner() {
-        return new AzureProvisioner();
+    public VMProvisioner createVMProvisioner() {
+        return new AzureProvisioner(); // Ya la tienes
+    }
+
+    @Override
+    public NetworkProvisioner createNetworkProvisioner() {
+        return new AzureNetworkProvisioner(); // Nueva clase creada
+    }
+
+    @Override
+    public StorageProvisioner createStorageProvisioner() {
+        return new AzureStorageProvisioner(); // Nueva clase creada
     }
 }

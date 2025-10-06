@@ -1,11 +1,21 @@
 package com.carcafe.vmprovisioningapi.factory;
 
-import com.carcafe.vmprovisioningapi.model.AWSProvisioner;
-import com.carcafe.vmprovisioningapi.model.VMProvisioner;
+import com.carcafe.vmprovisioningapi.model.*;
 
-public class AWSFactory extends VMFactory {
+public class AWSFactory implements AbstractFactory {
+
     @Override
-    public VMProvisioner createProvisioner() {
-        return new AWSProvisioner();
+    public VMProvisioner createVMProvisioner() {
+        return new AWSProvisioner(); // Ya la tienes
+    }
+
+    @Override
+    public NetworkProvisioner createNetworkProvisioner() {
+        return new AWSNetworkProvisioner(); // Nueva clase creada
+    }
+
+    @Override
+    public StorageProvisioner createStorageProvisioner() {
+        return new AWSStorageProvisioner(); // Nueva clase creada
     }
 }
