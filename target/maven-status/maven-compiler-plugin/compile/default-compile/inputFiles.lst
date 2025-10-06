@@ -1,0 +1,12 @@
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\view\Main.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\model\AzureProvisioner.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\model\GCPProvisioner.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\controller\ProvisioningAPI.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\model\AWSProvisioner.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\factory\AWSFactory.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\model\OnPremProvisioner.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\factory\GCPFactory.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\factory\OnPremFactory.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\model\VMProvisioner.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\factory\VMFactory.java
+C:\Users\edwar\OneDrive\Documentos\Aprendiendo java\multi-cloud\vmprovisioningapi\src\main\java\com\carcafe\vmprovisioningapi\factory\AzureFactory.java
