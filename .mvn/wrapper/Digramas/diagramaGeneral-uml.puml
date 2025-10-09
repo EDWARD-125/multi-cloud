@@ -1,0 +1,250 @@
+@startuml VMProvisioningDiagram_Detallado
+title Diagrama UML Completo - VMProvisioningAPI
+
+' =========================
+' CONFIGURACIÓN GLOBAL
+' =========================
+top to bottom direction
+scale 0.8
+skinparam dpi 150
+skinparam nodesep 15
+skinparam ranksep 20
+skinparam classPadding 2
+skinparam classBackgroundColor White
+skinparam classBorderColor Black
+skinparam shadowing false
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam ArrowColor #555555
+skinparam PackageBorderColor #999999
+skinparam PackageBackgroundColor #f8f8f8
+hide empty members
+
+' =========================
+' BUILDER PACKAGE
+' =========================
+rectangle "Builder Pattern" {
+    interface VMBuilder {
+        +setBasicConfiguration()
+        +enableMemoryOptimization()
+        +enableDiskOptimization()
+        +setSecurityOptions()
+        +build(): VirtualMachine
+    }
+
+    class VirtualMachine {
+        -provider: String
+        -vcpus: int
+        -memoryGB: int
+        -memoryOptimization: boolean
+        -diskOptimization: boolean
+        -keyPairName: String
+        -region: String
+        -firewallRules: List<String>
+        -publicIP: boolean
+        -iops: int
+        +getProvider(): String
+        +getVcpus(): int
+        +getMemoryGB(): int
+        +isMemoryOptimization(): boolean
+        +isDiskOptimization(): boolean
+        +toString(): String
+    }
+
+    class "VirtualMachine.Builder" as VMBuilderInner {
+        +setMemoryOptimization(boolean): Builder
+        +setDiskOptimization(boolean): Builder
+        +setKeyPairName(String): Builder
+        +setRegion(String): Builder
+        +setFirewallRules(List<String>): Builder
+        +setPublicIP(boolean): Builder
+        +setIops(int): Builder
+        +build(): VirtualMachine
+    }
+
+    class AWSVMBuilder {
+        -builder: VirtualMachine.Builder
+        +AWSVMBuilder(vcpus: int, memoryGB: int)
+        +setBasicConfiguration()
+        +enableMemoryOptimization()
+        +enableDiskOptimization()
+        +setSecurityOptions()
+        +build(): VirtualMachine
+    }
+
+    class AzureVMBuilder {
+        -builder: VirtualMachine.Builder
+        +AzureVMBuilder(vcpus: int, memoryGB: int)
+        +setBasicConfiguration()
+        +enableMemoryOptimization()
+        +enableDiskOptimization()
+        +setSecurityOptions()
+        +build(): VirtualMachine
+    }
+
+    class GCPVMBuilder {
+        -builder: VirtualMachine.Builder
+        +GCPVMBuilder(vcpus: int, memoryGB: int)
+        +setBasicConfiguration()
+        +enableMemoryOptimization()
+        +enableDiskOptimization()
+        +setSecurityOptions()
+        +build(): VirtualMachine
+    }
+
+    class OnPremVMBuilder {
+        -builder: VirtualMachine.Builder
+        +OnPremVMBuilder(vcpus: int, memoryGB: int)
+        +setBasicConfiguration()
+        +enableMemoryOptimization()
+        +enableDiskOptimization()
+        +setSecurityOptions()
+        +build(): VirtualMachine
+    }
+
+    class VMDirector {
+        +constructStandardVM(VMBuilder): VirtualMachine
+        +constructMemoryOptimizedVM(VMBuilder): VirtualMachine
+        +constructComputeOptimizedVM(VMBuilder): VirtualMachine
+    }
+
+    VMBuilder <|.. AWSVMBuilder
+    VMBuilder <|.. AzureVMBuilder
+    VMBuilder <|.. GCPVMBuilder
+    VMBuilder <|.. OnPremVMBuilder
+    VMDirector --> VMBuilder
+    VirtualMachine *-- VMBuilderInner
+}
+
+' =========================
+' FACTORY PACKAGE
+' =========================
+rectangle "Abstract Factory Pattern" {
+    interface AbstractFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    class AWSFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    class AzureFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    class GCPFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    class OnPremFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    AbstractFactory <|.. AWSFactory
+    AbstractFactory <|.. AzureFactory
+    AbstractFactory <|.. GCPFactory
+    AbstractFactory <|.. OnPremFactory
+}
+
+' =========================
+' MODEL PACKAGE
+' =========================
+rectangle "Model Layer" {
+    rectangle "VM Provisioners" {
+        interface VMProvisioner {
+            +provisionVM(nombreVM: String, cpu: int, memoria: int, almacenamiento: int)
+        }
+
+        class AWSProvisioner
+        class AzureProvisioner
+        class GCPProvisioner
+        class OnPremProvisioner
+
+        VMProvisioner <|.. AWSProvisioner
+        VMProvisioner <|.. AzureProvisioner
+        VMProvisioner <|.. GCPProvisioner
+        VMProvisioner <|.. OnPremProvisioner
+    }
+
+    rectangle "Network Provisioners" {
+        interface NetworkProvisioner {
+            +configurarRed(nombreRed: String)
+        }
+
+        class AWSNetworkProvisioner
+        class AzureNetworkProvisioner
+        class GCPNetworkProvisioner
+        class OnPremNetworkProvisioner
+
+        NetworkProvisioner <|.. AWSNetworkProvisioner
+        NetworkProvisioner <|.. AzureNetworkProvisioner
+        NetworkProvisioner <|.. GCPNetworkProvisioner
+        NetworkProvisioner <|.. OnPremNetworkProvisioner
+    }
+
+    rectangle "Storage Provisioners" {
+        interface StorageProvisioner {
+            +crearDisco(sizeGB: int, encriptado: boolean)
+        }
+
+        class AWSStorageProvisioner
+        class AzureStorageProvisioner
+        class GCPStorageProvisioner
+        class OnPremStorageProvisioner
+
+        StorageProvisioner <|.. AWSStorageProvisioner
+        StorageProvisioner <|.. AzureStorageProvisioner
+        StorageProvisioner <|.. GCPStorageProvisioner
+        StorageProvisioner <|.. OnPremStorageProvisioner
+    }
+}
+
+' =========================
+' CONTROLLER PACKAGE
+' =========================
+rectangle "Controller Layer" {
+    class ProvisionRequest {
+        -proveedor: String
+        -nombreVM: String
+        -cpu: int
+        -memoria: int
+        -almacenamiento: int
+        +getProveedor(): String
+        +getNombreVM(): String
+        +getCpu(): int
+        +getMemoria(): int
+        +getAlmacenamiento(): int
+    }
+
+    class ProvisioningController {
+        +provisionarVM(request: ProvisionRequest): ResponseEntity<Map<String, Object>>
+    }
+
+    ProvisioningController --> ProvisionRequest
+    ProvisioningController --> AbstractFactory
+    ProvisioningController --> VMProvisioner
+    ProvisioningController --> NetworkProvisioner
+    ProvisioningController --> StorageProvisioner
+}
+
+' =========================
+' MAIN SPRING CLASS
+' =========================
+rectangle "Main Application" {
+    class VmProvisioningApiApplication {
+        +main(args: String[]): void
+    }
+    VmProvisioningApiApplication --> ProvisioningController
+}
+
+@enduml

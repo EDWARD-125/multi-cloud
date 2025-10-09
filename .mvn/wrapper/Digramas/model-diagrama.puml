@@ -1,0 +1,97 @@
+@startuml ModelDiagram
+title Diagrama UML - Paquete model (vm, network, storage)
+
+' ===================================
+' ========== SUBPAQUETE VM ==========
+' ===================================
+package model_vm {
+
+    interface VMProvisioner {
+        +provisionVM(nombreVM: String, cpu: int, memoria: int, almacenamiento: int)
+    }
+
+    class AWSProvisioner {
+        +provisionVM(nombreVM: String, cpu: int, memoria: int, almacenamiento: int)
+    }
+
+    class AzureProvisioner {
+        +provisionVM(nombreVM: String, cpu: int, memoria: int, almacenamiento: int)
+    }
+
+    class GCPProvisioner {
+        +provisionVM(nombreVM: String, cpu: int, memoria: int, almacenamiento: int)
+    }
+
+    class OnPremProvisioner {
+        +provisionVM(nombreVM: String, cpu: int, memoria: int, almacenamiento: int)
+    }
+
+    AWSProvisioner -|> VMProvisioner
+    AzureProvisioner -|> VMProvisioner
+    GCPProvisioner -|> VMProvisioner
+    OnPremProvisioner -|> VMProvisioner
+}
+
+' ===================================
+' ======= SUBPAQUETE NETWORK ========
+' ===================================
+package model_network {
+
+    interface NetworkProvisioner {
+        +configurarRed(nombreRed: String)
+    }
+
+    class AWSNetworkProvisioner {
+        +configurarRed(nombreRed: String)
+    }
+
+    class AzureNetworkProvisioner {
+        +configurarRed(nombreRed: String)
+    }
+
+    class GCPNetworkProvisioner {
+        +configurarRed(nombreRed: String)
+    }
+
+    class OnPremNetworkProvisioner {
+        +configurarRed(nombreRed: String)
+    }
+
+    AWSNetworkProvisioner -|> NetworkProvisioner
+    AzureNetworkProvisioner -|> NetworkProvisioner
+    GCPNetworkProvisioner -|> NetworkProvisioner
+    OnPremNetworkProvisioner -|> NetworkProvisioner
+}
+
+' ===================================
+' ======== SUBPAQUETE STORAGE =======
+' ===================================
+package model_storage {
+
+    interface StorageProvisioner {
+        +crearDisco(sizeGB: int, encriptado: boolean)
+    }
+
+    class AWSStorageProvisioner {
+        +crearDisco(sizeGB: int, encriptado: boolean)
+    }
+
+    class AzureStorageProvisioner {
+        +crearDisco(sizeGB: int, encriptado: boolean)
+    }
+
+    class GCPStorageProvisioner {
+        +crearDisco(sizeGB: int, encriptado: boolean)
+    }
+
+    class OnPremStorageProvisioner {
+        +crearDisco(sizeGB: int, encriptado: boolean)
+    }
+
+    AWSStorageProvisioner -|> StorageProvisioner
+    AzureStorageProvisioner -|> StorageProvisioner
+    GCPStorageProvisioner -|> StorageProvisioner
+    OnPremStorageProvisioner -|> StorageProvisioner
+}
+
+@enduml

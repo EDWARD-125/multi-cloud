@@ -1,0 +1,26 @@
+@startuml ControllerDiagram
+title Diagrama UML - Paquete controller
+
+package controller {
+    class provisioningController {
+        +createVM(provider: String, request: ProvisionRequest): void
+    }
+
+    class ProvisionRequest {
+        -nombreVM: String
+        -cpu: int
+        -memoria: int
+        -almacenamiento: int
+        -red: String
+        -tamanoDisco: int
+        -encriptado: boolean
+        +getNombreVM(): String
+        +getCpu(): int
+        +getMemoria(): int
+        +getAlmacenamiento(): int
+    }
+
+    provisioningController --> ProvisionRequest : usa
+}
+
+@enduml

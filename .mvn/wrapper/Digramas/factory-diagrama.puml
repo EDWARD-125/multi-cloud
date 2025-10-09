@@ -1,0 +1,61 @@
+@startuml FactoryDiagram
+title Diagrama UML - Paquete factory
+
+package factory {
+
+    interface AbstractFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    class AWSFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    class AzureFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    class GCPFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    class OnPremFactory {
+        +createVMProvisioner(): VMProvisioner
+        +createNetworkProvisioner(): NetworkProvisioner
+        +createStorageProvisioner(): StorageProvisioner
+    }
+
+    ' Relaciones de herencia (implementación)
+    AWSFactory -|> AbstractFactory
+    AzureFactory -|> AbstractFactory
+    GCPFactory -|> AbstractFactory
+    OnPremFactory -|> AbstractFactory
+
+    ' Dependencias hacia los modelos
+    AbstractFactory --> VMProvisioner
+    AbstractFactory --> NetworkProvisioner
+    AbstractFactory --> StorageProvisioner
+}
+
+' Paquetes externos de referencia (solo para claridad visual)
+package model.vm {
+    interface VMProvisioner
+}
+
+package model.network {
+    interface NetworkProvisioner
+}
+
+package model.storage {
+    interface StorageProvisioner
+}
+
+@enduml
