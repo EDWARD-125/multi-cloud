@@ -1,11 +1,11 @@
 package com.carcafe.multicloud.model.network;
 
+/**
+ * Implementación concreta de NetworkProvisioner para Azure.
+ */
 public class AzureNetworkProvisioner implements NetworkProvisioner {
     @Override
-    public void configurarRed(String nombreRed) {
-        System.out.println(" [AZURE] Configurando red virtual para: " + nombreRed);
-        System.out.println("virtualNetwork: vnet-" + (int)(Math.random()*1000));
-        System.out.println("subnetName: subnet-" + (int)(Math.random()*1000));
-        System.out.println("networkSecurityGroup: nsg-" + (int)(Math.random()*1000));
+    public String createNetwork() {
+        return "Red virtual (VNet) configurada correctamente en Azure.";
     }
 }

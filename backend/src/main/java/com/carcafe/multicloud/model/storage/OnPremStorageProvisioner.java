@@ -1,10 +1,11 @@
 package com.carcafe.multicloud.model.storage;
 
+/**
+ * Implementación concreta de StorageProvisioner para On-Premise.
+ */
 public class OnPremStorageProvisioner implements StorageProvisioner {
-
     @Override
-    public void crearDisco(int sizeGB, boolean encriptado) {
-        System.out.println("[ON-PREM] Creando disco local de " + sizeGB + " GB, encriptado=" + encriptado);
+    public String createStorage() {
+        return "Disco o volumen local configurado exitosamente en entorno On-Premise.";
     }
-
 }

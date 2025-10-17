@@ -1,14 +1,11 @@
 package com.carcafe.multicloud.model.vm;
 
+/**
+ * Implementación concreta de VMProvisioner para Google Cloud Platform.
+ */
 public class GCPProvisioner implements VMProvisioner {
-
     @Override
-    public void provisionVM(String nombreVM, int cpu, int memoria, int almacenamiento) {
-        System.out.println(" Aprovisionando máquina virtual en Google Cloud Platform...");
-        System.out.println("Nombre: " + nombreVM);
-        System.out.println("CPU: " + cpu + " núcleos");
-        System.out.println("Memoria: " + memoria + " GB");
-        System.out.println("Almacenamiento: " + almacenamiento + " GB");
-        System.out.println(" Máquina creada exitosamente en GCP.");
+    public String createVM() {
+        return "Instancia Compute Engine creada exitosamente en Google Cloud.";
     }
 }

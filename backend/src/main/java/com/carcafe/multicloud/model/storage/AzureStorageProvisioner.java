@@ -1,10 +1,11 @@
 package com.carcafe.multicloud.model.storage;
 
+/**
+ * Implementación concreta de StorageProvisioner para Azure.
+ */
 public class AzureStorageProvisioner implements StorageProvisioner {
     @Override
-    public void crearDisco(int sizeGB, boolean encriptado) {
-        System.out.println("[AZURE] Creando disco administrado de " + sizeGB + " GB, encriptado=" + encriptado);
-        System.out.println("diskSku: Premium_LRS");
+    public String createStorage() {
+        return "Disco administrado (Managed Disk) creado exitosamente en Azure.";
     }
-
 }

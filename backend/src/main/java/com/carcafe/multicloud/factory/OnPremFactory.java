@@ -1,27 +1,26 @@
 package com.carcafe.multicloud.factory;
 
+import com.carcafe.multicloud.model.vm.*;
+import com.carcafe.multicloud.model.network.*;
+import com.carcafe.multicloud.model.storage.*;
 
-import com.carcafe.multicloud.model.network.NetworkProvisioner;
-import com.carcafe.multicloud.model.network.OnPremNetworkProvisioner;
-import com.carcafe.multicloud.model.storage.OnPremStorageProvisioner;
-import com.carcafe.multicloud.model.storage.StorageProvisioner;
-import com.carcafe.multicloud.model.vm.OnPremProvisioner;
-import com.carcafe.multicloud.model.vm.VMProvisioner;
-
+/**
+ * Fábrica concreta para entornos On-Premise (infraestructura local).
+ */
 public class OnPremFactory implements AbstractFactory {
 
     @Override
     public VMProvisioner createVMProvisioner() {
-        return new OnPremProvisioner(); // Ya la tienes
+        return new OnPremProvisioner();
     }
 
     @Override
     public NetworkProvisioner createNetworkProvisioner() {
-        return new OnPremNetworkProvisioner(); // Nueva clase creada
+        return new OnPremNetworkProvisioner();
     }
 
     @Override
     public StorageProvisioner createStorageProvisioner() {
-        return new OnPremStorageProvisioner(); // Nueva clase creada
+        return new OnPremStorageProvisioner();
     }
 }

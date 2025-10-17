@@ -1,10 +1,11 @@
 package com.carcafe.multicloud.model.network;
 
+/**
+ * Implementación concreta de NetworkProvisioner para On-Premise.
+ */
 public class OnPremNetworkProvisioner implements NetworkProvisioner {
-
     @Override
-    public void configurarRed(String nombreRed) {
-        // Lógica para configurar una red específica en infraestructura local
-        System.out.println("Configurando la red '" + nombreRed + "' en infraestructura local...");
+    public String createNetwork() {
+        return "Red local configurada correctamente en entorno On-Premise.";
     }
 }

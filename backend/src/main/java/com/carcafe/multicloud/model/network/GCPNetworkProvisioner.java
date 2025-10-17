@@ -1,10 +1,11 @@
 package com.carcafe.multicloud.model.network;
 
+/**
+ * Implementación concreta de NetworkProvisioner para Google Cloud Platform.
+ */
 public class GCPNetworkProvisioner implements NetworkProvisioner {
-
     @Override
-    public void configurarRed(String nombreRed) {
-        // Lógica para configurar una red específica en GCP
-        System.out.println("Configurando la red '" + nombreRed + "' en Google Cloud Platform...");
+    public String createNetwork() {
+        return "Red VPC configurada correctamente en Google Cloud.";
     }
 }

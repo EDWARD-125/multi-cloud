@@ -1,14 +1,11 @@
 package com.carcafe.multicloud.model.vm;
 
+/**
+ * Implementación concreta de VMProvisioner para Microsoft Azure.
+ */
 public class AzureProvisioner implements VMProvisioner {
-
     @Override
-    public void provisionVM(String nombreVM, int cpu, int memoria, int almacenamiento) {
-        System.out.println("Aprovisionando máquina virtual en Microsoft Azure...");
-        System.out.println("Nombre: " + nombreVM);
-        System.out.println("CPU: " + cpu + " núcleos");
-        System.out.println("Memoria: " + memoria + " GB");
-        System.out.println("Almacenamiento: " + almacenamiento + " GB");
-        System.out.println(" Máquina creada exitosamente en Azure.");
+    public String createVM() {
+        return "Máquina virtual creada exitosamente en Azure (Azure VM).";
     }
 }

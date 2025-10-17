@@ -1,12 +1,12 @@
 package com.carcafe.multicloud.factory;
 
-import com.carcafe.multicloud.model.vm.AzureProvisioner;
-import com.carcafe.multicloud.model.network.AzureNetworkProvisioner;
-import com.carcafe.multicloud.model.storage.AzureStorageProvisioner;
-import com.carcafe.multicloud.model.vm.VMProvisioner;
-import com.carcafe.multicloud.model.network.NetworkProvisioner;
-import com.carcafe.multicloud.model.storage.StorageProvisioner;
+import com.carcafe.multicloud.model.vm.*;
+import com.carcafe.multicloud.model.network.*;
+import com.carcafe.multicloud.model.storage.*;
 
+/**
+ * Fábrica concreta para el proveedor Microsoft Azure.
+ */
 public class AzureFactory implements AbstractFactory {
 
     @Override

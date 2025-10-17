@@ -1,5 +1,8 @@
 package com.carcafe.multicloud.model.vm;
 
+/**
+ * Interfaz para crear máquinas virtuales (parte del patrón Abstract Factory).
+ */
 public interface VMProvisioner {
-    void provisionVM(String nombreVM, int cpu, int memoria, int almacenamiento);
+    String createVM();
 }

@@ -1,27 +1,26 @@
 package com.carcafe.multicloud.factory;
 
+import com.carcafe.multicloud.model.vm.*;
+import com.carcafe.multicloud.model.network.*;
+import com.carcafe.multicloud.model.storage.*;
 
-import com.carcafe.multicloud.model.network.GCPNetworkProvisioner;
-import com.carcafe.multicloud.model.network.NetworkProvisioner;
-import com.carcafe.multicloud.model.storage.GCPStorageProvisioner;
-import com.carcafe.multicloud.model.storage.StorageProvisioner;
-import com.carcafe.multicloud.model.vm.GCPProvisioner;
-import com.carcafe.multicloud.model.vm.VMProvisioner;
-
+/**
+ * Fábrica concreta para Google Cloud Platform.
+ */
 public class GCPFactory implements AbstractFactory {
 
     @Override
     public VMProvisioner createVMProvisioner() {
-        return new GCPProvisioner(); // Ya la tienes
+        return new GCPProvisioner();
     }
 
     @Override
     public NetworkProvisioner createNetworkProvisioner() {
-        return new GCPNetworkProvisioner(); // Nueva clase creada
+        return new GCPNetworkProvisioner();
     }
 
     @Override
     public StorageProvisioner createStorageProvisioner() {
-        return new GCPStorageProvisioner(); // Nueva clase creada
+        return new GCPStorageProvisioner();
     }
 }

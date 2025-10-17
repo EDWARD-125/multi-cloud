@@ -6,29 +6,30 @@ import org.springframework.web.bind.annotation.*;
 
 import com.carcafe.multicloud.builder.*;
 import com.carcafe.multicloud.factory.*;
-import com.carcafe.multicloud.model.network.NetworkProvisioner;
-import com.carcafe.multicloud.model.storage.StorageProvisioner;
-import com.carcafe.multicloud.model.vm.VMProvisioner;
+import com.carcafe.multicloud.prototype.VMPrototype;
 
 import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Controlador principal para el aprovisionamiento de recursos en la nube.
- * Usa el patrón Builder y Abstract Factory para construir y aprovisionar máquinas virtuales según el proveedor.
+ * Controlador principal para el aprovisionamiento y clonación de recursos en la nube.
+ * Integra los patrones Builder, Abstract Factory y Prototype.
  */
 @RestController
 @RequestMapping("/api/v1")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ProvisioningController {
 
+    // =======================
+    // ✅ ENDPOINT: PROVISIONAR VM
+    // =======================
     @PostMapping("/provision")
     public ResponseEntity<Map<String, Object>> provisionarVM(@Valid @RequestBody ProvisionRequest request) {
         Map<String, Object> response = new HashMap<>();
 
         try {
-            // ✅ Validaciones básicas
+            // Validaciones básicas
             if (request.getProveedor() == null || request.getProveedor().isBlank())
                 throw new IllegalArgumentException("El campo 'proveedor' es obligatorio.");
             if (request.getNombreVM() == null || request.getNombreVM().isBlank())
@@ -40,7 +41,7 @@ public class ProvisioningController {
             if (request.getAlmacenamiento() <= 0)
                 throw new IllegalArgumentException("El almacenamiento debe ser mayor que 0 GB.");
 
-            // ✅ Crear Builder según proveedor
+            // Crear el Builder según el proveedor
             VMBuilder builder;
             VMDirector director = new VMDirector();
             String provider = request.getProveedor().toLowerCase();
@@ -53,7 +54,7 @@ public class ProvisioningController {
                 default -> throw new IllegalArgumentException("Proveedor no soportado: " + request.getProveedor());
             }
 
-            // ✅ Construir VM según el tipo de optimización
+            // Construcción según optimización
             VirtualMachine vm;
             if (request.isMemoryOptimization()) {
                 vm = director.constructMemoryOptimizedVM(builder, request.getProveedor());
@@ -63,30 +64,95 @@ public class ProvisioningController {
                 vm = director.constructStandardVM(builder, request.getProveedor());
             }
 
-            // ✅ Integrar Abstract Factory (creación de red, almacenamiento y SO)
-            AbstractFactory factory = FactoryProvider.getFactory(request.getProveedor());
-            VMProvisioner vmProv = factory.createVMProvisioner();
-            NetworkProvisioner netProv = factory.createNetworkProvisioner();
-            StorageProvisioner storProv = factory.createStorageProvisioner();
+            // Aplicar datos del request
+            vm.setRegion(request.getRegion());
+            vm.setIops(request.getIops());
+            vm.setEstado("Aprovisionada correctamente");
 
-            String vmResult = vmProv.provisionVM(vm);
-            String network = netProv.createNetwork();
-            String storage = storProv.createStorage();
+            // Integración con la Abstract Factory (opcional)
+            AbstractFactory factory = switch (provider) {
+                case "aws" -> new AWSFactory();
+                case "azure" -> new AzureFactory();
+                case "gcp" -> new GCPFactory();
+                case "onprem" -> new OnPremFactory();
+                default -> null;
+            };
 
-            // ✅ Armar respuesta enriquecida
-            response.put("estado", "Aprovisionada correctamente");
-            response.put("proveedor", request.getProveedor());
+            if (factory != null) {
+                vm.setNetwork(factory.createNetworkProvisioner().createNetwork());
+                vm.setDiskType(factory.createStorageProvisioner().createStorage());
+                vm.setOs(factory.createVMProvisioner().createVM());
+            }
+
+            // Respuesta final
+            response.put("estado", vm.getEstado());
+            response.put("proveedor", vm.getProvider());
             response.put("nombreVM", request.getNombreVM());
-            response.put("cpu", request.getCpu());
-            response.put("memoria", request.getMemoria());
+            response.put("cpu", vm.getVcpus());
+            response.put("memoria", vm.getMemoryGB());
             response.put("almacenamiento", request.getAlmacenamiento());
-            response.put("region", request.getRegion());
-            response.put("network", network);
-            response.put("storage", storage);
-            response.put("so", vmProv.getOS());
+            response.put("region", vm.getRegion());
+            response.put("network", vm.getNetwork());
+            response.put("diskType", vm.getDiskType());
+            response.put("so", vm.getOs());
+            response.put("iops", vm.getIops());
+            response.put("publicIP", vm.isPublicIP());
             response.put("firewallRules", request.getFirewallRules());
-            response.put("iops", request.getIops());
-            response.put("detalle", vmResult);
+            response.put("configuracion", vm);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+
+        } catch (IllegalArgumentException e) {
+            response.put("error", "Error en la solicitud");
+            response.put("detalle", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+        } catch (Exception e) {
+            response.put("error", "Error interno del servidor");
+            response.put("detalle", e.getMessage());
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
+    // =======================
+    // 🧬 ENDPOINT: CLONAR VM
+    // =======================
+    @PostMapping("/clone")
+    public ResponseEntity<Map<String, Object>> clonarVM(@Valid @RequestBody ProvisionRequest request) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            if (request.getProveedor() == null || request.getProveedor().isBlank())
+                throw new IllegalArgumentException("Debe especificar el proveedor de la VM a clonar.");
+
+            // Simular la obtención de una VM existente
+            VirtualMachine vmOriginal = new VirtualMachine.Builder(
+                    request.getProveedor(), request.getCpu(), request.getMemoria())
+                    .setRegion(request.getRegion())
+                    .setFirewallRules(request.getFirewallRules())
+                    .setIops(request.getIops())
+                    .setPublicIP(request.isPublicIP())
+                    .build();
+
+            vmOriginal.setNetwork("vpc-12345");
+            vmOriginal.setDiskType("SSD");
+            vmOriginal.setOs("Linux Ubuntu 22.04");
+            vmOriginal.setEstado("Aprovisionada previamente");
+
+            // Clonación con Prototype
+            VirtualMachine vmClonada = (VirtualMachine) vmOriginal.clone();
+            vmClonada.setEstado("Clon creada correctamente");
+
+            // Se puede cambiar nombre o región si el usuario lo indica
+            if (request.getRegion() != null) {
+                vmClonada.setRegion(request.getRegion());
+            }
+
+            // Respuesta
+            response.put("mensaje", "Clonación exitosa del recurso virtual");
+            response.put("vmOriginal", vmOriginal);
+            response.put("vmClonada", vmClonada);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 

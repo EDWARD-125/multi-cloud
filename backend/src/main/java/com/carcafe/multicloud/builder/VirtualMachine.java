@@ -1,8 +1,17 @@
 package com.carcafe.multicloud.builder;
 
+import com.carcafe.multicloud.prototype.VMPrototype;
+import java.util.ArrayList;
 import java.util.List;
 
-public class VirtualMachine {
+/**
+ * Clase que representa una Máquina Virtual dentro del sistema Multi-Cloud.
+ * Integra los patrones:
+ * - Builder: para construcción paso a paso.
+ * - Abstract Factory: para agregar componentes según el proveedor.
+ * - Prototype: para clonar VMs existentes con facilidad.
+ */
+public class VirtualMachine implements VMPrototype {
 
     // --- Atributos obligatorios ---
     private String provider;
@@ -45,11 +54,30 @@ public class VirtualMachine {
     public String getOs() { return os; }
     public String getEstado() { return estado; }
 
-    // --- Setters solo para la fábrica o director ---
+    // --- Setters (solo para fábrica o director) ---
     public void setNetwork(String network) { this.network = network; }
     public void setDiskType(String diskType) { this.diskType = diskType; }
     public void setOs(String os) { this.os = os; }
     public void setEstado(String estado) { this.estado = estado; }
+
+    // --- Setters adicionales para compatibilidad con el controlador ---
+    public void setRegion(String region) { this.region = region; }
+    public void setIops(int iops) { this.iops = iops; }
+
+    // --- Método del patrón Prototype ---
+    @Override
+    public VMPrototype clone() {
+        try {
+            VirtualMachine clone = (VirtualMachine) super.clone();
+            // Clonación profunda de la lista de reglas de firewall
+            clone.firewallRules = this.firewallRules != null
+                    ? new ArrayList<>(this.firewallRules)
+                    : new ArrayList<>();
+            return clone;
+        } catch (CloneNotSupportedException e) {
+            throw new RuntimeException("Error al clonar la máquina virtual", e);
+        }
+    }
 
     @Override
     public String toString() {
