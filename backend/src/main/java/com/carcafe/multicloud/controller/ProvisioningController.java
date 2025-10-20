@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import com.carcafe.multicloud.builder.*;
 import com.carcafe.multicloud.factory.*;
 import com.carcafe.multicloud.service.VirtualMachineService;
-import jakarta.validation.Valid;
+import com.carcafe.multicloud.builder.VirtualMachine;
+import com.carcafe.multicloud.controller.ProvisionRequest;
 
+import jakarta.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,10 +21,9 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/v1")
-@CrossOrigin(origins = "http://localhost:5173")
+@CrossOrigin(origins = "http://localhost:5174") // habilita peticiones desde el frontend (puerto Vite)
 public class ProvisioningController {
 
-    // 🧠 Servicio de persistencia inyectado
     @Autowired
     private VirtualMachineService vmService;
 
@@ -59,7 +60,7 @@ public class ProvisioningController {
                 default -> throw new IllegalArgumentException("Proveedor no soportado: " + request.getProveedor());
             }
 
-            // Construcción según optimización
+            // Construcción según tipo de optimización
             VirtualMachine vm;
             if (request.isMemoryOptimization()) {
                 vm = director.constructMemoryOptimizedVM(builder, request.getProveedor());
@@ -69,7 +70,12 @@ public class ProvisioningController {
                 vm = director.constructStandardVM(builder, request.getProveedor());
             }
 
-            // Aplicar datos del request
+            // 🔧 Asignar valores faltantes (importante para mostrar en el frontend)
+            vm.setVcpus(request.getCpu());
+            vm.setMemoryGB(request.getMemoria());
+            vm.setDiskType(request.getAlmacenamiento() + " GB");
+
+            // Aplicar propiedades adicionales
             vm.setRegion(request.getRegion());
             vm.setIops(request.getIops());
             vm.setFirewallRules(request.getFirewallRules());
@@ -86,15 +92,14 @@ public class ProvisioningController {
 
             if (factory != null) {
                 vm.setNetwork(factory.createNetworkProvisioner().createNetwork());
-                vm.setDiskType(factory.createStorageProvisioner().createStorage());
                 vm.setOs(factory.createVMProvisioner().createVM());
             }
 
-            // 💾 Guardar VM en la base de datos
+            // Guardar en BD
             VirtualMachine savedVM = vmService.save(vm);
 
-            // Respuesta final
-            response.put("mensaje", "Máquina virtual aprovisionada y almacenada correctamente");
+            // Respuesta limpia y ordenada
+            response.put("mensaje", "Máquina virtual aprovisionada correctamente");
             response.put("vmId", savedVM.getId());
             response.put("estado", savedVM.getEstado());
             response.put("proveedor", savedVM.getProvider());
@@ -127,7 +132,7 @@ public class ProvisioningController {
             if (request.getProveedor() == null || request.getProveedor().isBlank())
                 throw new IllegalArgumentException("Debe especificar el proveedor de la VM a clonar.");
 
-            // Simular la obtención de una VM existente
+            // Simula una VM base
             VirtualMachine vmOriginal = new VirtualMachine.Builder(
                     request.getProveedor(), request.getCpu(), request.getMemoria())
                     .setRegion(request.getRegion())
@@ -141,15 +146,14 @@ public class ProvisioningController {
             vmOriginal.setOs("Linux Ubuntu 22.04");
             vmOriginal.setEstado("Aprovisionada previamente");
 
-            // Clonación con Prototype
+            // Clonación usando Prototype
             VirtualMachine vmClonada = (VirtualMachine) vmOriginal.clone();
             vmClonada.setEstado("Clon creada correctamente");
 
-            // Guardar clon en base de datos
+            // Guardar clon
             VirtualMachine savedClone = vmService.save(vmClonada);
 
-            // Respuesta
-            response.put("mensaje", "Clonación exitosa y almacenada en base de datos");
+            response.put("mensaje", "Clonación exitosa");
             response.put("vmClonada", savedClone);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);

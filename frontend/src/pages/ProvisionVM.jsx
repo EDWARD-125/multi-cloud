@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import axios from "axios";
+import { useTemplateRegistry } from "../contexts/TemplateRegistry";
 
 // Logos de proveedores
 import awsLogo from "../assets/aws.svg";
@@ -23,6 +24,9 @@ const logos = {
 
 export default function ProvisionVM() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const registry = useTemplateRegistry();
+
   const [selectedProvider, setSelectedProvider] = useState("");
 
   // Estado del formulario
@@ -87,6 +91,7 @@ export default function ProvisionVM() {
 
     try {
       setLoading(true);
+
       const payload = {
         ...formData,
         cpu: parseInt(formData.cpu),
@@ -98,6 +103,20 @@ export default function ProvisionVM() {
           : [],
       };
 
+      // 💾 Registrar la VM como una nueva plantilla (Prototype base)
+      registry.register({
+        id: `local-${Date.now()}`,
+        name: formData.nombreVM,
+        provider: formData.proveedor,
+        vm: {
+          vcpus: parseInt(formData.cpu),
+          memoryGB: parseInt(formData.memoria),
+        },
+        storage: { size: parseInt(formData.almacenamiento) },
+        network: { region: formData.region },
+      });
+
+      // Llamar al backend
       const response = await api.post("/provision", payload);
       setResult(response.data);
     } catch (err) {
@@ -114,6 +133,51 @@ export default function ProvisionVM() {
   // --- UI ---
   return (
     <div className="container mx-auto p-6 max-w-2xl">
+      {/* LISTADO DE PLANTILLAS */}
+      <div className="bg-gray-50 border border-gray-200 p-4 rounded-xl mb-6 shadow-sm">
+        <h2 className="text-xl font-semibold mb-3 text-gray-800">
+          Plantillas guardadas
+        </h2>
+        {Object.keys(registry.templates).length === 0 ? (
+          <p className="text-gray-500 text-sm">
+            No hay plantillas aún. Crea una y se podrá clonar aquí.
+          </p>
+        ) : (
+          <ul className="space-y-2">
+            {registry.list().map((t) => (
+              <li
+                key={t.id}
+                className="flex justify-between items-center bg-white p-3 rounded-md shadow-sm border"
+              >
+                <div>
+                  <span className="font-medium">{t.name}</span> —{" "}
+                  <span className="text-sm text-gray-600">{t.provider}</span>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    className="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 text-sm"
+                    onClick={() => {
+                      const clone = registry.clone(t.id, {
+                        name: `${t.name}-copia`,
+                      });
+                      navigate(`/editor/${clone.id}`);
+                    }}
+                  >
+                    Clonar
+                  </button>
+                  <button
+                    className="bg-gray-100 text-gray-700 px-3 py-1 rounded hover:bg-gray-200 text-sm"
+                    onClick={() => navigate(`/editor/${t.id}`)}
+                  >
+                    Editar
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
       {/* LOGO Y ENCABEZADO */}
       {selectedProvider && (
         <motion.div
@@ -356,12 +420,26 @@ export default function ProvisionVM() {
             </p>
           </div>
 
+          {/* BLOQUE DE INFORMACIÓN ACTUALIZADO */}
           <div className="grid grid-cols-2 gap-3 text-gray-800">
-            <p><strong>VM:</strong> {result.nombreVM}</p>
-            <p><strong>Región:</strong> {result.region || "—"}</p>
-            <p><strong>CPU:</strong> {result.cpu} vCPUs</p>
-            <p><strong>Memoria:</strong> {result.memoria} GB</p>
-            <p><strong>Disco:</strong> {result.almacenamiento} GB</p>
+            <p>
+              <strong>Proveedor:</strong> {result.proveedor}
+            </p>
+            <p>
+              <strong>Región:</strong> {result.region || result.configuracion?.region || "—"}
+            </p>
+            <p>
+              <strong>CPU:</strong> {result.configuracion?.vcpus} vCPUs
+            </p>
+            <p>
+              <strong>Memoria:</strong> {result.configuracion?.memoryGB} GB
+            </p>
+            <p>
+              <strong>Disco:</strong> {result.configuracion?.diskType || "—"}
+            </p>
+            <p>
+              <strong>Sistema Operativo:</strong> {result.configuracion?.os || "—"}
+            </p>
           </div>
 
           <hr className="my-4 border-green-200" />
@@ -370,55 +448,16 @@ export default function ProvisionVM() {
             Componentes creados:
           </h3>
           <ul className="list-disc list-inside text-gray-800 space-y-1">
-            {result.network && <li><strong>Red:</strong> {result.network}</li>}
-            {result.diskType && (
-              <li>
-                <strong>Tipo de Disco:</strong> {result.diskType}{" "}
-                {result.iops && <span>(IOPS: {result.iops})</span>}
-              </li>
+            {result.configuracion?.network && (
+              <li><strong>Red:</strong> {result.configuracion.network}</li>
             )}
-            {result.so && <li><strong>Sistema Operativo:</strong> {result.so}</li>}
-            {result.storage && (
-              <li><strong>Almacenamiento:</strong> {result.storage}</li>
-            )}
-            {result.firewallRules?.length > 0 && (
+            {result.configuracion?.firewallRules?.length > 0 && (
               <li>
                 <strong>Reglas de Firewall:</strong>{" "}
-                {result.firewallRules.join(", ")}
+                {result.configuracion.firewallRules.join(", ")}
               </li>
             )}
           </ul>
-
-          <hr className="my-4 border-green-200" />
-
-          <h3 className="text-lg font-semibold text-green-800 mb-2">
-            Configuraciones Avanzadas:
-          </h3>
-          <div className="grid grid-cols-2 gap-3 text-gray-800">
-            <p>
-              <strong>Optimizaciones:</strong>{" "}
-              {formData.memoryOptimization || formData.diskOptimization
-                ? `${formData.memoryOptimization ? "Memoria " : ""}${
-                    formData.diskOptimization ? "Disco" : ""
-                  }`
-                : "Ninguna"}
-            </p>
-            <p>
-              <strong>IP Pública:</strong>{" "}
-              {formData.publicIP ? "Asignada" : "No asignada"}
-            </p>
-            {formData.keyPairName && (
-              <p>
-                <strong>Par de claves:</strong> {formData.keyPairName}
-              </p>
-            )}
-          </div>
-
-          {result.detalle && (
-            <div className="mt-4 text-gray-700 italic text-center">
-              {result.detalle}
-            </div>
-          )}
 
           <div className="mt-3 text-green-800 font-semibold text-center">
             {result.estado || "Provisionamiento exitoso"}

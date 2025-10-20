@@ -3,12 +3,12 @@ import Footer from "./Footer";
 
 export default function LayoutBase({ children }) {
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
-      {/* Navbar superior */}
+    <div className="flex flex-col min-h-screen">
+      {/* Navbar */}
       <Navbar />
 
       {/* Contenido principal */}
-      <main className="flex-grow container mx-auto px-6 py-10">
+      <main className="flex-grow">
         {children}
       </main>
 

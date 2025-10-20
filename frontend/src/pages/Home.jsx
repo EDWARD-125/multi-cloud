@@ -9,7 +9,6 @@ import onpremLogo from "../assets/onprem.svg";
 export default function Home() {
   const navigate = useNavigate();
 
-  // Definimos los proveedores
   const providers = [
     { id: "aws", name: "AWS", logo: awsLogo },
     { id: "azure", name: "Azure", logo: azureLogo },
@@ -18,23 +17,22 @@ export default function Home() {
   ];
 
   const handleClick = (provider) => {
-    // 🔹 Redirige al formulario con el proveedor en la URL y en el estado
     navigate(`/provision?provider=${provider.id}`, { state: { provider } });
   };
 
   return (
-    <section
-      className="flex flex-col items-center text-center py-20 min-h-[80vh] bg-cover bg-center bg-no-repeat"
+    <div
+      className="min-h-[calc(100vh-160px)] flex items-center justify-center bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${cloudImage})` }}
     >
-      <div className="bg-white/70 p-10 rounded-2xl shadow-lg max-w-4xl backdrop-blur-md">
-        {/* HERO PRINCIPAL */}
+      <div className="bg-white/80 p-10 rounded-2xl shadow-xl max-w-5xl w-full text-center backdrop-blur-md">
+        {/* HERO */}
         <motion.div
           initial={{ opacity: 0, y: -30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="text-5xl font-extrabold text-blue-800 mb-4 drop-shadow">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-blue-800 mb-4 drop-shadow">
             🌩️ Multi-Cloud Provisioning Platform
           </h1>
           <p className="text-lg text-gray-700 mb-8">
@@ -42,9 +40,9 @@ export default function Home() {
           </p>
         </motion.div>
 
-        {/* LOGOS CON ENLACES */}
+        {/* LOGOS */}
         <motion.div
-          className="flex flex-wrap justify-center gap-10 mt-16"
+          className="flex flex-wrap justify-center gap-12 mt-12"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
@@ -59,28 +57,26 @@ export default function Home() {
               <img
                 src={provider.logo}
                 alt={provider.name}
-                className="w-20 h-20 object-contain mx-auto"
+                className="w-20 h-20 md:w-24 md:h-24 object-contain"
               />
-              <p className="mt-2 text-gray-700 font-medium">{provider.name}</p>
+              <p className="mt-2 text-gray-700 font-semibold text-lg">{provider.name}</p>
             </motion.div>
           ))}
         </motion.div>
 
-        {/* SECCIÓN INFERIOR */}
+        {/* TEXTO FINAL */}
         <motion.div
-          className="mt-20"
+          className="mt-16"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.7, duration: 0.8 }}
         >
-          <h2 className="text-3xl font-bold text-blue-700 mb-2">
+          <h2 className="text-2xl md:text-3xl font-bold text-blue-700 mb-2">
             Bienvenido a Multi-Cloud
           </h2>
-          <p className="text-gray-600">
-            Gestión centralizada de máquinas virtuales.
-          </p>
+          <p className="text-gray-600">Gestión centralizada de máquinas virtuales.</p>
         </motion.div>
       </div>
-    </section>
+    </div>
   );
 }
