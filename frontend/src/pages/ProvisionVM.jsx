@@ -130,6 +130,23 @@ export default function ProvisionVM() {
     }
   };
 
+  // --- Manejo de la clonación ---
+  const handleClone = async (id) => {
+    const clone = registry.clone(id, {
+      name: `${formData.nombreVM}-copia`,
+    });
+
+    try {
+      // Enviar la solicitud POST al backend para persistir la VM clonada
+      const response = await api.post("/clone", clone); // Asegúrate de enviar los datos necesarios
+
+      // Redirigir al editor con el ID de la nueva VM clonada
+      navigate(`/editor/${response.data.id}`);
+    } catch (error) {
+      console.error("Error clonando la VM: ", error);
+    }
+  };
+
   // --- UI ---
   return (
     <div className="container mx-auto p-6 max-w-2xl">
@@ -156,12 +173,7 @@ export default function ProvisionVM() {
                 <div className="flex gap-2">
                   <button
                     className="bg-blue-100 text-blue-700 px-3 py-1 rounded hover:bg-blue-200 text-sm"
-                    onClick={() => {
-                      const clone = registry.clone(t.id, {
-                        name: `${t.name}-copia`,
-                      });
-                      navigate(`/editor/${clone.id}`);
-                    }}
+                    onClick={() => handleClone(t.id)} // Usamos la función handleClone para clonar
                   >
                     Clonar
                   </button>
