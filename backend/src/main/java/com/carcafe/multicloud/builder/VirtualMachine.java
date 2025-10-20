@@ -1,6 +1,7 @@
 package com.carcafe.multicloud.builder;
 
 import com.carcafe.multicloud.prototype.VMPrototype;
+import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +11,16 @@ import java.util.List;
  * - Builder: para construcción paso a paso.
  * - Abstract Factory: para agregar componentes según el proveedor.
  * - Prototype: para clonar VMs existentes con facilidad.
+ * - JPA: para persistir la información en base de datos.
  */
+@Entity
+@Table(name = "virtual_machines")
 public class VirtualMachine implements VMPrototype {
+
+    // --- 🔑 Clave primaria para persistencia ---
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     // --- Atributos obligatorios ---
     private String provider;
@@ -23,7 +32,11 @@ public class VirtualMachine implements VMPrototype {
     private boolean diskOptimization;
     private String keyPairName;
     private String region;
-    private List<String> firewallRules;
+
+    // 🧱 Lista persistente (guardada en tabla secundaria)
+    @ElementCollection(fetch = FetchType.EAGER)
+    private List<String> firewallRules = new ArrayList<>();
+
     private boolean publicIP;
     private int iops;
 
@@ -35,10 +48,11 @@ public class VirtualMachine implements VMPrototype {
     // --- Estado general ---
     private String estado;        // "Provisionada correctamente", "Error", etc.
 
-    // Constructor privado (solo lo usa el builder)
-    private VirtualMachine() {}
+    // Constructor vacío (requerido por JPA)
+    public VirtualMachine() {}
 
     // --- Getters ---
+    public Long getId() { return id; }
     public String getProvider() { return provider; }
     public int getVcpus() { return vcpus; }
     public int getMemoryGB() { return memoryGB; }
@@ -54,15 +68,22 @@ public class VirtualMachine implements VMPrototype {
     public String getOs() { return os; }
     public String getEstado() { return estado; }
 
-    // --- Setters (solo para fábrica o director) ---
+    // --- Setters ---
+    public void setId(Long id) { this.id = id; }
     public void setNetwork(String network) { this.network = network; }
     public void setDiskType(String diskType) { this.diskType = diskType; }
     public void setOs(String os) { this.os = os; }
     public void setEstado(String estado) { this.estado = estado; }
-
-    // --- Setters adicionales para compatibilidad con el controlador ---
     public void setRegion(String region) { this.region = region; }
     public void setIops(int iops) { this.iops = iops; }
+    public void setFirewallRules(List<String> firewallRules) { this.firewallRules = firewallRules; }
+    public void setProvider(String provider) { this.provider = provider; }
+    public void setVcpus(int vcpus) { this.vcpus = vcpus; }
+    public void setMemoryGB(int memoryGB) { this.memoryGB = memoryGB; }
+    public void setMemoryOptimization(boolean memoryOptimization) { this.memoryOptimization = memoryOptimization; }
+    public void setDiskOptimization(boolean diskOptimization) { this.diskOptimization = diskOptimization; }
+    public void setKeyPairName(String keyPairName) { this.keyPairName = keyPairName; }
+    public void setPublicIP(boolean publicIP) { this.publicIP = publicIP; }
 
     // --- Método del patrón Prototype ---
     @Override
@@ -73,16 +94,20 @@ public class VirtualMachine implements VMPrototype {
             clone.firewallRules = this.firewallRules != null
                     ? new ArrayList<>(this.firewallRules)
                     : new ArrayList<>();
+            clone.id = null; // 🔥 El clon no debe tener el mismo ID (nuevo registro)
+            clone.estado = "Clon de otra VM";
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Error al clonar la máquina virtual", e);
         }
     }
 
+    // --- Representación en texto ---
     @Override
     public String toString() {
         return "\n Virtual Machine {" +
-                "\n  provider='" + provider + '\'' +
+                "\n  id=" + id +
+                ", provider='" + provider + '\'' +
                 ", vcpus=" + vcpus +
                 ", memoryGB=" + memoryGB +
                 ", region='" + region + '\'' +

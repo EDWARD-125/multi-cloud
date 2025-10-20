@@ -1,25 +1,30 @@
 package com.carcafe.multicloud.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.carcafe.multicloud.builder.*;
 import com.carcafe.multicloud.factory.*;
-import com.carcafe.multicloud.prototype.VMPrototype;
-
+import com.carcafe.multicloud.service.VirtualMachineService;
 import jakarta.validation.Valid;
+
 import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Controlador principal para el aprovisionamiento y clonación de recursos en la nube.
- * Integra los patrones Builder, Abstract Factory y Prototype.
+ * Integra los patrones Builder, Abstract Factory, Prototype y la persistencia JPA.
  */
 @RestController
 @RequestMapping("/api/v1")
 @CrossOrigin(origins = "http://localhost:5173")
 public class ProvisioningController {
+
+    // 🧠 Servicio de persistencia inyectado
+    @Autowired
+    private VirtualMachineService vmService;
 
     // =======================
     // ✅ ENDPOINT: PROVISIONAR VM
@@ -67,9 +72,10 @@ public class ProvisioningController {
             // Aplicar datos del request
             vm.setRegion(request.getRegion());
             vm.setIops(request.getIops());
+            vm.setFirewallRules(request.getFirewallRules());
             vm.setEstado("Aprovisionada correctamente");
 
-            // Integración con la Abstract Factory (opcional)
+            // Integración con la Abstract Factory
             AbstractFactory factory = switch (provider) {
                 case "aws" -> new AWSFactory();
                 case "azure" -> new AzureFactory();
@@ -84,21 +90,16 @@ public class ProvisioningController {
                 vm.setOs(factory.createVMProvisioner().createVM());
             }
 
+            // 💾 Guardar VM en la base de datos
+            VirtualMachine savedVM = vmService.save(vm);
+
             // Respuesta final
-            response.put("estado", vm.getEstado());
-            response.put("proveedor", vm.getProvider());
-            response.put("nombreVM", request.getNombreVM());
-            response.put("cpu", vm.getVcpus());
-            response.put("memoria", vm.getMemoryGB());
-            response.put("almacenamiento", request.getAlmacenamiento());
-            response.put("region", vm.getRegion());
-            response.put("network", vm.getNetwork());
-            response.put("diskType", vm.getDiskType());
-            response.put("so", vm.getOs());
-            response.put("iops", vm.getIops());
-            response.put("publicIP", vm.isPublicIP());
-            response.put("firewallRules", request.getFirewallRules());
-            response.put("configuracion", vm);
+            response.put("mensaje", "Máquina virtual aprovisionada y almacenada correctamente");
+            response.put("vmId", savedVM.getId());
+            response.put("estado", savedVM.getEstado());
+            response.put("proveedor", savedVM.getProvider());
+            response.put("region", savedVM.getRegion());
+            response.put("configuracion", savedVM);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
@@ -144,15 +145,12 @@ public class ProvisioningController {
             VirtualMachine vmClonada = (VirtualMachine) vmOriginal.clone();
             vmClonada.setEstado("Clon creada correctamente");
 
-            // Se puede cambiar nombre o región si el usuario lo indica
-            if (request.getRegion() != null) {
-                vmClonada.setRegion(request.getRegion());
-            }
+            // Guardar clon en base de datos
+            VirtualMachine savedClone = vmService.save(vmClonada);
 
             // Respuesta
-            response.put("mensaje", "Clonación exitosa del recurso virtual");
-            response.put("vmOriginal", vmOriginal);
-            response.put("vmClonada", vmClonada);
+            response.put("mensaje", "Clonación exitosa y almacenada en base de datos");
+            response.put("vmClonada", savedClone);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
