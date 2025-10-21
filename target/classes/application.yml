@@ -1,0 +1,49 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+  error:
+    include-message: always
+    include-binding-errors: always
+
+spring:
+  application:
+    name: vm-provisioning-api
+  
+  # Configuración JSON
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+      indent-output: true
+
+# Configuración de OpenAPI/Swagger
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+  show-actuator: false
+
+# Logging
+logging:
+  level:
+    root: INFO
+    com.carcafe.vmprovisioningapi: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Información de la aplicación
+info:
+  app:
+    name: VM Provisioning API
+    description: API REST para aprovisionamiento multi-cloud
+    version: 1.0.0
+    providers:
+      - AWS
+      - Azure
+      - GCP
+      - OnPrem
