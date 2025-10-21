@@ -1,0 +1,11 @@
+com\carcafe\vmprovisioningapi\factory\GCPFactory.class
+com\carcafe\vmprovisioningapi\model\VMProvisioner.class
+com\carcafe\vmprovisioningapi\factory\VMFactory.class
+com\carcafe\vmprovisioningapi\model\AWSProvisioner.class
+com\carcafe\vmprovisioningapi\model\AzureProvisioner.class
+com\carcafe\vmprovisioningapi\view\Main.class
+com\carcafe\vmprovisioningapi\model\GCPProvisioner.class
+com\carcafe\vmprovisioningapi\factory\AzureFactory.class
+com\carcafe\vmprovisioningapi\factory\OnPremFactory.class
+com\carcafe\vmprovisioningapi\model\OnPremProvisioner.class
+com\carcafe\vmprovisioningapi\factory\AWSFactory.class
